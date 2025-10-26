@@ -100,6 +100,61 @@
     outline-offset: 2px;
   }
 
+
+  .sf-row{display:grid;grid-template-columns:140px 90px 1fr 1fr;gap:8px;align-items:center;border-bottom:1px solid #1a2035;padding:8px 6px}
+  .sf-head{font-weight:800;color:#e9efff;background:#10162a;border-radius:10px;padding:8px 6px;margin-bottom:4px}
+  .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid #273056;background:#0d142b}
+  .b-green{border-color:#2f7;box-shadow:0 0 0 1px rgba(40,255,160,.25) inset}
+  .b-yellow{border-color:#fd6;box-shadow:0 0 0 1px rgba(255,214,107,.25) inset}
+  .b-red{border-color:#f77;box-shadow:0 0 0 1px rgba(255,120,120,.25) inset}
+
+
+  /* --- Responsive fixes for Panel Semáforo --- */
+  #semaforoWrap{overflow:auto;-webkit-overflow-scrolling:touch}
+  .sf-row{display:grid;grid-template-columns:140px 90px 1fr 1fr;gap:8px;align-items:center;border-bottom:1px solid #1a2035;padding:8px 6px}
+  .sf-head{font-weight:800;color:#e9efff;background:#10162a;border-radius:10px;padding:8px 6px;margin-bottom:4px}
+  .sf-cell{min-width:0}
+  @media (max-width: 980px){
+    .sf-row{grid-template-columns:120px 80px 1fr 1fr}
+  }
+  @media (max-width: 780px){
+    .sf-row{grid-template-columns:1fr 1fr}
+    .sf-head{display:none}
+    .sf-cell.c-dom{grid-column:1 / 2; font-weight:700}
+    .sf-cell.c-state{grid-column:2 / 3; justify-self:end}
+    .sf-cell.c-val{grid-column:1 / 3}
+    .sf-cell.c-meta{grid-column:1 / 3; color:#9aa4c4}
+  }
+
+
+  /* ===== Semáforo: tabla alineada + responsive ===== */
+  table.semaforo{width:100%; border-collapse:separate; border-spacing:0; table-layout:fixed}
+  table.semaforo thead th{
+    text-align:left; font-weight:800; color:#e9efff; background:#10162a;
+    padding:10px 8px; border-bottom:1px solid #1a2035
+  }
+  table.semaforo tbody td{
+    padding:10px 8px; border-bottom:1px solid #1a2035; vertical-align:middle; word-break:break-word
+  }
+  table.semaforo .col-dom{width:28%}
+  table.semaforo .col-state{width:14%}
+  table.semaforo .col-val{width:29%}
+  table.semaforo .col-meta{width:29%}
+  .badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid #273056;background:#0d142b}
+  .b-green{border-color:#2f7;box-shadow:0 0 0 1px rgba(40,255,160,.25) inset}
+  .b-yellow{border-color:#fd6;box-shadow:0 0 0 1px rgba(255,214,107,.25) inset}
+  .b-red{border-color:#f77;box-shadow:0 0 0 1px rgba(255,120,120,.25) inset}
+
+  /* Mobile stacked rows */
+  @media (max-width: 760px){
+    table.semaforo thead{display:none}
+    table.semaforo, table.semaforo tbody, table.semaforo tr, table.semaforo td{display:block; width:100%}
+    table.semaforo tr{border:1px solid #1a2035; border-radius:12px; padding:8px; margin:10px 0; background:#0f1422}
+    table.semaforo td{display:flex; justify-content:space-between; gap:12px; border:none; padding:6px 4px}
+    table.semaforo td::before{content:attr(data-label); color:#9aa4c4; font-weight:600}
+    table.semaforo .col-dom{font-weight:800; color:#e9efff}
+  }
+
 </style>
 </head>
 <body>
@@ -326,6 +381,17 @@
       </section>
     
     <section class="card col-12">
+      </section>
+    
+    <section class="card col-12">
+      <h2>Conclusión · Panel semáforo</h2>
+      <div class="muted" style="margin-bottom:8px">Resumen de palancas clave con estado actual y meta.</div>
+      <div id="semaforoWrap" class="card" style="background:#0d142b;border:1px solid #273056">
+        <div class="grid" id="semaforoBody" style="gap:8px"></div>
+      </div>
+    </section>
+
+    <section class="card col-12">
       <h2>Plan y recomendaciones</h2>
       <ul id="recoList" class="muted" style="margin:6px 0 0 18px"></ul>
     </section>
@@ -533,7 +599,11 @@ function computeAll(){
   halo.className = "halo " + cls;
   bubbleNumber.textContent = age_ext.toFixed(1);
   document.getElementById("bubbleCaption").textContent = caption;
+  try{ buildRecommendations(diff); }catch(_){ }
+  try{ buildSemaforo(); }catch(_){ }
+
   try{ buildRecommendations(diff); }catch(_){}
+  try{ buildSemaforo(); }catch(_){console.warn(_);}
 }
 
 /* ===== Shared modal ===== */
@@ -818,7 +888,7 @@ function deleteProfile(name){
   refreshProfileList();
   alert("Paciente borrado.");
 }
-function loadSelectedProfile(){ const n=val("profileSelect"); loadProfile(n); renderEvolution(n); }
+function loadSelectedProfile(){ const n=val("profileSelect"); loadProfile(n); renderEvolution(n); try{ buildSemaforo(); }catch(_){}}
 function deleteSelectedProfile(){ const n=val("profileSelect"); deleteProfile(n); }
 
 
@@ -1063,6 +1133,7 @@ function registerVisit(){
   setProfiles(p);
   refreshProfileList(name);
   renderEvolution(name);
+  try{ buildSemaforo(); }catch(_){}
   alert("Visita registrada ("+dateStr+").");
 }
 
@@ -1153,6 +1224,119 @@ function renderEvolution(name){
 }
 
 
+
+/* (Semáforo: versión tabla activa más abajo) */
+
+function badge(color){ 
+  if(color==="green") return '<span class="badge b-green">🟢 Bien</span>';
+  if(color==="yellow") return '<span class="badge b-yellow">🟡 Mejorable</span>';
+  return '<span class="badge b-red">🔴 Revisar</span>';
+}
+function buildSemaforo(){
+  const wrap = document.getElementById("semaforoWrap");
+  if(!wrap) return;
+  if(!wrap.querySelector("table.semaforo")){
+    wrap.innerHTML = `
+      <table class="semaforo">
+        <thead>
+          <tr>
+            <th class="col-dom">Dominio</th>
+            <th class="col-state">Estado</th>
+            <th class="col-val">Valor</th>
+            <th class="col-meta">Meta</th>
+          </tr>
+        </thead>
+        <tbody id="semaforoBody"></tbody>
+      </table>
+    `;
+  }
+  const body = document.getElementById("semaforoBody");
+  if(!body) return;
+  body.innerHTML = "";
+
+  const rows = [];
+  const SBP = n(val("SBP"));
+  let taState=""; let taMeta="<130 mmHg"; let taVal="—";
+  if(has(SBP)){ taVal = SBP.toFixed(0)+" mmHg"; taState = SBP<130? "green" : (SBP<140? "yellow" : "red"); } else taState="yellow";
+  rows.push({dom:"Tensión arterial", state:taState, val:taVal, meta:taMeta});
+
+  const A1c = n(val("A1c")); const FPG = n(val("FPG"));
+  let glyVal="—", glyMeta="A1c <5.7% (o FPG <100 mg/dL)", glyState="yellow";
+  if(has(A1c)){ glyVal = A1c.toFixed(1)+" %"; glyState = A1c<5.7? "green" : (A1c<6.5? "yellow" : "red"); }
+  else if(has(FPG)){ glyVal = FPG.toFixed(0)+" mg/dL"; glyState = FPG<100? "green" : (FPG<126? "yellow" : "red"); }
+  rows.push({dom:"Glucosa", state:glyState, val:glyVal, meta:glyMeta});
+
+  const ApoB = n(val("ApoB")); const nHDL = n(val("nonHDL"));
+  let lipVal="—", lipMeta="ApoB <90 mg/dL (o no‑HDL <130)", lipState="yellow";
+  if(has(ApoB)){ lipVal = ApoB.toFixed(0)+" mg/dL"; lipState = ApoB<90? "green" : (ApoB<110? "yellow" : "red"); }
+  else if(has(nHDL)){ lipVal = nHDL.toFixed(0)+" mg/dL"; lipState = nHDL<130? "green" : (nHDL<160? "yellow" : "red"); }
+  rows.push({dom:"Lípidos", state:lipState, val:lipVal, meta:lipMeta});
+
+  const TST = n(val("TST")), SEp = n(val("SE"));
+  let sleepMeta = "7–9 h y SE ≥85%";
+  let sleepVal = (has(TST)?TST.toFixed(1)+" h":"—") + " · " + (has(SEp)?SEp.toFixed(0)+"%":"—");
+  let sleepState = "yellow";
+  if(has(TST) && has(SEp)){ const okT = TST>=7 && TST<=9, okE = SEp>=85; sleepState = (okT && okE) ? "green" : (okT || okE ? "yellow" : "red"); }
+  if(val("STOP")==="si") sleepState = (sleepState==="green" ? "yellow" : "red");
+  rows.push({dom:"Sueño", state:sleepState, val:sleepVal, meta:sleepMeta});
+
+  const MVPA=n(val("MVPA"));
+  let actVal = has(MVPA)? (MVPA.toFixed(0)+" min/sem") : "—";
+  let actMeta = "≥150 min/sem";
+  let actState = has(MVPA)? (MVPA>=150? "green" : (MVPA>=75? "yellow" : "red")) : "yellow";
+  rows.push({dom:"Actividad (aeróbico)", state:actState, val:actVal, meta:actMeta});
+
+  const STR=n(val("STR"));
+  let strVal = has(STR)? (STR.toFixed(0)+" días/sem") : "—";
+  let strMeta = "≥2 días/sem";
+  let strState = has(STR)? (STR>=2? "green" : (STR===1? "yellow" : "red")) : "yellow";
+  rows.push({dom:"Fuerza", state:strState, val:strVal, meta:strMeta});
+
+  const MD=n(val("MedDiet")), UL=n(val("Ultra"));
+  let dietVal = (has(MD)? MD.toFixed(0)+"/14":"—") + " · " + (has(UL)? UL.toFixed(0)+"/sem":"—");
+  let dietMeta = "MedDiet ≥10/14 · UPF <3/sem";
+  let dietState = "yellow";
+  if(has(MD) || has(UL)){
+    const okMD = has(MD) ? (MD>=10) : false;
+    const okUPF = has(UL) ? (UL<3) : false;
+    if(okMD && okUPF) dietState="green";
+    else if(okMD || okUPF) dietState="yellow";
+    else dietState="red";
+  }
+  rows.push({dom:"Dieta", state:dietState, val:dietVal, meta:dietMeta});
+
+  const al = n(val("AlcoholU"));
+  if(has(al)){
+    const sex = val("sex");
+    const limit = (sex==="female")? 7 : 14;
+    let aState = al<=limit ? "green" : "red";
+    rows.push({dom:"Alcohol", state:aState, val:al.toFixed(0)+" u/sem", meta:"≤"+limit+" u/sem"});
+  }
+  if(val("sex")==="female"){
+    const anyOb = (document.getElementById("hx_GHTN")?.checked ||
+                   document.getElementById("hx_GDM")?.checked ||
+                   document.getElementById("hx_Preeclampsia")?.checked);
+    const y = val("lastPregYear");
+    const obVal = (anyOb? "riesgo presente" : "—") + (y? (" · " + y):"");
+    const obMeta = "Cribado cardiometabólico reforzado si antecedentes";
+    const obState = anyOb? "yellow":"green";
+    rows.push({dom:"Antecedentes obstétricos", state:obState, val:obVal, meta:obMeta});
+  }
+
+  const body2 = document.getElementById("semaforoBody");
+  if(!body2) return;
+  rows.forEach(r=>{
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="col-dom" data-label="Dominio">${r.dom}</td>
+      <td class="col-state" data-label="Estado">${badge(r.state)}</td>
+      <td class="col-val" data-label="Valor">${r.val}</td>
+      <td class="col-meta" data-label="Meta">${r.meta}</td>
+    `;
+    body2.appendChild(tr);
+  });
+}
+
 /* Auto-guardado del borrador actual */
 function autosaveDraft(){
   const draft = readForm();
@@ -1203,6 +1387,7 @@ window.addEventListener("DOMContentLoaded", ()=>{
     document.getElementById("Ultra").value=3;
     document.getElementById("AlcoholU").value=2;
     computeAll();
+    try{ buildSemaforo(); }catch(_){ }
 
     // Inicialización de perfiles/draft
     try{
