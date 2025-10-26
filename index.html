@@ -3,14 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ThymeAge v2.2 · Cardio Longevity Age</title>
-<meta name="description" content="ThymeAge v2.2: Calculadora de Edad-Salud (CORE y Extendido) con núcleo gelatina, halo dinámico y módulos de Sueño, Estrés, Aeróbico, Fuerza y Nutrición Mediterránea.">
+<title>ThymeAge v2.9.1 · Cardio Longevity Age</title>
+<meta name="description" content="ThymeAge v2.9.1: CORE + Extendido con cuestionarios integrados (PSS-10, PHQ-9, GAD-7, STOP-BANG), checklist de UPF y test PREDIMED de Dieta Mediterránea.">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🫧</text></svg>">
 <style>
-  :root{
-    --bg:#0a0c12; --panel:#0f1422; --ink:#e9efff; --muted:#9aa4c4; --grid:#1a2035;
-    --accent:#62ffd0; --accent2:#6ae3ff; --good:#6affad; --warn:#ffd66b; --bad:#ff6b6b;
-  }
+  :root{ --bg:#0a0c12; --panel:#0f1422; --ink:#e9efff; --muted:#9aa4c4; --grid:#1a2035;
+         --accent:#62ffd0; --good:#6affad; --warn:#ffd66b; --bad:#ff6b6b; }
   *{box-sizing:border-box}
   body{margin:0;background:radial-gradient(60% 80% at 50% 10%, #0f1730, #090c16);color:var(--ink);
        font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;line-height:1.6;font-size:16px}
@@ -29,9 +27,10 @@
   label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
   input, select{width:100%;padding:12px;border-radius:12px;background:#0c1120;border:1px solid #1e2742;color:var(--ink);outline:none;font-size:16px}
   input:focus, select:focus{border-color:#2e3c6e}
-  .btn{background:linear-gradient(180deg,#1b8eff,#1279ff);border:none;color:#fff;border-radius:12px;padding:12px 16px;cursor:pointer;font-weight:800;font-size:15px}
+  .btn{background:linear-gradient(180deg,#1b8eff,#1279ff);border:none;color:#fff;border-radius:12px;padding:10px 14px;cursor:pointer;font-weight:800;font-size:14px}
+  .btn.small{padding:6px 10px;font-size:12px}
   .btn.ghost{background:#10162b;border:1px solid #263259;color:var(--ink)}
-  .stack{display:flex;gap:12px;flex-wrap:wrap}
+  .stack{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
   .kpi .label{color:var(--muted);font-size:13px;margin-bottom:6px}
   .kpi .val{font-size:30px;font-weight:900}
   .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -43,15 +42,13 @@
   .muted{color:var(--muted);font-size:13px}
   .pill{display:inline-block;border:1px solid #273056;background:#0d142b;padding:7px 11px;border-radius:999px;color:var(--muted);font-size:12px}
   footer{max-width:1200px;margin:24px auto 44px auto;padding:0 18px;color:var(--muted);font-size:12px;text-align:center;border-top:1px solid #1a2035;padding-top:12px}
-
-  /* === GELATIN BUBBLE v2.2 === */
   .bubble-wrap{position:relative;display:flex;align-items:center;gap:18px}
-  .bubble-area{position:relative;width:180px;height:180px;display:grid;place-items:center}
-  .halo{position:absolute;width:160px;height:160px;border-radius:50%;filter:blur(16px);opacity:.65;animation:pulse 3s ease-in-out infinite}
+  .bubble-area{position:relative;width:260px;height:260px;display:grid;place-items:center}
+  .halo{position:absolute;width:240px;height:240px;border-radius:50%;filter:blur(16px);opacity:.65;animation:pulse 3s ease-in-out infinite}
   .halo.good{background:radial-gradient(60% 60% at 50% 50%, rgba(90,255,170,.55), rgba(60,200,150,.10)); box-shadow:0 0 40px rgba(90,255,170,.35)}
   .halo.warn{background:radial-gradient(60% 60% at 50% 50%, rgba(255,210,120,.55), rgba(255,180,80,.10)); box-shadow:0 0 40px rgba(255,210,120,.35)}
   .halo.bad{ background:radial-gradient(60% 60% at 50% 50%, rgba(255,120,120,.55), rgba(255,80,80,.10));  box-shadow:0 0 40px rgba(255,120,120,.35)}
-  .bubble{width:160px;height:160px;border-radius:50%;
+  .bubble{width:240px;height:240px;border-radius:50%;
           background:radial-gradient(60% 60% at 40% 35%, rgba(160,255,210,.55), rgba(100,200,255,.18));
           position:relative;filter:url(#goo);
           box-shadow:0 0 50px rgba(100,200,255,.25) inset, 0 0 40px rgba(100,200,255,.15);
@@ -65,10 +62,44 @@
   .bubble.good{background:radial-gradient(60% 60% at 40% 35%, rgba(90,255,170,.55), rgba(60,200,150,.15));}
   .bubble.warn{background:radial-gradient(60% 60% at 40% 35%, rgba(255,210,120,.55), rgba(255,180,80,.15));}
   .bubble.bad{ background:radial-gradient(60% 60% at 40% 35%, rgba(255,120,120,.55), rgba(255,80,80,.15));}
-  .bubble-number{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:900;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.45)}
-  .bubble-caption{font-size:13px;color:var(--muted)}
+  .bubble-number{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:54px;font-weight:900;color:#fff;text-shadow:0 4px 18px rgba(0,0,0,.55)}
+  .bubble-caption{font-size:14px;color:var(--muted)}
   svg#filters{position:absolute;width:0;height:0}
   .sound-toggle{display:flex;gap:8px;align-items:center;margin-top:8px;font-size:13px;color:var(--muted)}
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:50}
+  .modal.open{display:flex}
+  .modal-card{background:#0f1422;border:1px solid #1a2035;border-radius:14px;max-width:840px;width:92%;
+  padding:0;box-shadow:0 10px 30px rgba(0,0,0,.45);display:flex;flex-direction:column;max-height:85vh;overflow:hidden}
+  .modal-head{position:sticky;top:0;background:#10162a;border-bottom:1px solid #1a2035;padding:12px 16px;display:flex;align-items:center;gap:8px}
+  .modal-head h3{margin:0}
+  .modal-close{margin-left:auto;background:transparent;border:1px solid #273056;border-radius:10px;color:#e9efff;padding:6px 10px;cursor:pointer}
+  .modal-body{padding:12px 16px;overflow:auto;max-height:65vh}
+  .modal-actions{position:sticky;bottom:0;background:#10162a;border-top:1px solid #1a2035;padding:12px 16px;display:flex;justify-content:flex-end;gap:10px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opts label{position:relative;padding:10px 12px;border-radius:10px;border:1px solid #273056;background:#0d142b;cursor:pointer}
+  .opts input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .modal h3{color:#e9efff;margin:0 0 8px 0}
+  .q{margin:10px 0;padding:12px;border:1px solid #1e2742;border-radius:10px;background:#0c1120}
+  .q label{display:block;color:#cfd7ff;font-size:13px;margin-bottom:6px}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opts label{background:#0d142b;border:1px solid #273056;border-radius:999px;padding:6px 10px;cursor:pointer}
+  .opts input{position:absolute;inset:0;opacity:0;cursor:pointer}
+  .modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:12px}
+  .upf-grid{display:grid;grid-template-columns:1fr 120px;gap:8px;align-items:center}
+  .upf-grid input[type=number]{width:100%;padding:10px}
+
+  /* Visual feedback when an option is selected or focused */
+  .opts label:has(input:checked){
+    border-color: var(--accent);
+    background: linear-gradient(180deg, #12213b, #0f1b33);
+    box-shadow: 0 0 0 2px rgba(98,255,208,.15), inset 0 0 0 1px rgba(98,255,208,.25);
+    color: #e9efff;
+  }
+  .opts label:has(input:focus-visible){
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
 </style>
 </head>
 <body>
@@ -85,10 +116,22 @@
 <header>
   <div class="wrap">
     <div class="brand">
-      <span class="big">ThymeAge v2.2 — Cardio Longevity Age</span>
+      <span class="big">ThymeAge v2.9.1 — Cardio Longevity Age</span>
       <span class="by">by Dra. Antonela Costa Varsi</span>
     </div>
     <div style="flex:1"></div>
+    <div class="stack" style="min-width:320px">
+      <select id="profileSelect" title="Pacientes guardados" style="min-width:160px">
+        <option value="">— Pacientes —</option>
+      </select>
+      <button class="btn small" onclick="saveProfile()">Guardar paciente</button>
+      <button class="btn small" onclick="registerVisit()">Registrar visita</button>
+      <button class="btn small ghost" onclick="loadSelectedProfile()">Cargar</button>
+      <button class="btn small ghost" onclick="deleteSelectedProfile()">Borrar</button>
+      <button class="btn small" onclick="duplicateProfile()">Duplicar</button>
+      <button class="btn small ghost" onclick="duplicateToday()">Duplicar hoy</button>
+    </div>
+
     <button class="btn" onclick="computeAll()">Calcular</button>
     <button class="btn ghost" onclick="saveJSON()">Guardar</button>
     <button class="btn ghost" onclick="loadJSON()">Cargar</button>
@@ -99,6 +142,33 @@
   <div class="grid">
     <section class="card col-8">
       <h2>Datos básicos</h2>
+      <div class="stack" style="margin-bottom:8px">
+        <div style="flex:2 1 260px;min-width:220px">
+          <label>Nombre del paciente</label>
+      </div>
+        <div style="flex:1 1 180px;min-width:160px">
+          <label>ID / Historia clínica</label>
+          <input id="patientId" type="text" placeholder="Opcional">
+        </div>
+        <div style="flex:1 1 180px;min-width:160px">
+          <label>Fecha de consulta</label>
+          <input id="visitDate" type="date">
+        </div><div>
+          <label>Plan / Objetivos</label>
+          <textarea id="planNotes" rows="2" style="width:100%;padding:12px;border-radius:12px;background:#0c1120;border:1px solid #1e2742;color:#e9efff;outline:none" placeholder="Metas SMART, intervenciones, próximos pasos"></textarea>
+        </div>
+      </div>
+</div>
+      <div>
+        <label>Notas</label>
+        <textarea id="patientNotes" rows="3" style="width:100%;padding:12px;border-radius:12px;background:#0c1120;border:1px solid #1e2742;color:#e9efff;outline:none" placeholder="Observaciones clínicas, acuerdos, objetivos..."></textarea>
+      </div>
+
+          <input id="patientName" type="text" placeholder="Nombre y apellido">
+        </div>
+        <div class="muted" style="align-self:flex-end">Guarda este nombre para registrar y seguir pacientes.</div>
+      </div>
+
       <div class="stack">
         <div style="flex:1 1 160px;min-width:160px">
           <label>Sexo</label>
@@ -130,6 +200,7 @@
             <div class="right"><div class="muted">+ Módulos</div><div id="delta_modules">–</div></div>
           </div>
           <div class="bubble-caption" id="bubbleCaption">Estado óptimo</div>
+          
           <label class="sound-toggle"><input id="soundOn" type="checkbox"> Activar sonido cuando el resultado es óptimo</label>
         </div>
       </div>
@@ -152,6 +223,7 @@
           <h3>Antropometría & Fitness</h3>
           <label>Cintura (cm)</label><input id="waist" type="number" step="0.1" placeholder="72">
           <label>Altura (cm)</label><input id="height" type="number" step="0.1" placeholder="165">
+          <label>Peso (kg)</label><input id="weight" type="number" step="0.1" placeholder="--">
           <label>FC reposo (lpm)</label><input id="RHR" type="number" step="1" placeholder="64">
           <label>VO₂max (ml/kg/min)</label><input id="VO2" type="number" step="0.1" placeholder="36">
           <label>Fuerza prensión (kg)</label><input id="grip" type="number" step="0.1" placeholder="28">
@@ -159,6 +231,24 @@
           <select id="smoke"><option value="never">Nunca</option><option value="former">Exfumadora</option><option value="current">Actual</option></select>
         </div>
       </div>
+    
+      
+      <div id="obHistory" class="card" style="margin-top:10px;padding:12px">
+        <h3 style="margin:0 0 8px 0">Antecedentes obstétricos relevantes (solo mujeres)</h3>
+        <div class="two" style="margin-bottom:6px"><div><label>Año del último embarazo/parto</label><input id="lastPregYear" type="number" min="1960" max="2100" placeholder="Ej: 2019"></div><div></div></div>
+        <div class="opts" role="group" aria-label="Antecedentes del embarazo">
+          <label><input id="hx_GHTN" type="checkbox" value="si"> HTA gestacional</label>
+          <label><input id="hx_GDM" type="checkbox" value="si"> Diabetes gestacional</label>
+          <label><input id="hx_Preeclampsia" type="checkbox" value="si"> Preeclampsia / Eclampsia</label>
+        </div>
+        <div class="muted" style="margin-top:6px">Se usan para ajustar riesgo cardiometabólico a futuro.</div>
+      </div>
+      <div class="two" style="margin-top:10px">
+        <div>
+          <label>Objetivo de peso (kg)</label>
+          <div class="stack"><select id="goalMethod" style="min-width:180px"><option value="clinical">Clínico (personalizado)</option><option value="bmi22">IMC 22.0</option><option value="bmi249">IMC 24.9</option><option value="minus5">−5% del peso</option><option value="minus10">−10% del peso</option></select><input id="goalWeight" type="number" step="0.1" placeholder="Ej: 62.0"></div>
+        </div>
+        
     </section>
 
     <section class="card col-6">
@@ -170,21 +260,44 @@
           <label>Eficiencia de sueño (%)</label><input id="SE" type="number" step="1" placeholder="88">
           <label>AHI (si estudio)</label><input id="AHI" type="number" step="1" placeholder="">
           <label>ODI (si estudio)</label><input id="ODI" type="number" step="1" placeholder="">
-          <label>STOP-BANG alto</label><select id="STOP"><option value="no">No</option><option value="si">Sí</option></select>
+          <div class="stack">
+            <label>STOP-BANG alto</label>
+            <select id="STOP"><option value="no">No</option><option value="si">Sí</option></select>
+            <button class="btn small" onclick="openSTOP()">Rellenar STOP‑BANG</button>
+          </div>
         </div>
         <div>
           <h3>Estrés / Mental</h3>
-          <label>PSS-10 (0–40)</label><input id="PSS" type="number" step="1" placeholder="14">
-          <label>PHQ-9 (0–27)</label><input id="PHQ" type="number" step="1" placeholder="3">
-          <label>GAD-7 (0–21)</label><input id="GAD" type="number" step="1" placeholder="3">
-          <h3>Actividad</h3>
+          <div class="stack">
+            <div style="flex:1">
+              <label>PSS-10 (0–40)</label>
+              <div class="stack"><input id="PSS" type="number" step="1" placeholder="14"><button class="btn small" onclick="openPSS()">Rellenar PSS-10</button></div>
+            </div>
+            <div style="flex:1">
+              <label>PHQ-9 (0–27)</label>
+              <div class="stack"><input id="PHQ" type="number" step="1" placeholder="3"><button class="btn small" onclick="openPHQ()">Rellenar PHQ-9</button></div>
+            </div>
+            <div style="flex:1">
+              <label>GAD-7 (0–21)</label>
+              <div class="stack"><input id="GAD" type="number" step="1" placeholder="3"><button class="btn small" onclick="openGAD()">Rellenar GAD-7</button></div>
+            </div>
+          </div>
+          <h3 style="margin-top:10px">Actividad</h3>
           <label>Aeróbico · MVPA (min/sem)</label><input id="MVPA" type="number" step="10" placeholder="150">
           <label>Fuerza · días/sem</label><input id="STR" type="number" step="1" placeholder="2">
         </div>
         <div>
           <h3>Nutrición</h3>
-          <label>Adherencia Dieta Mediterránea (0–14)</label><input id="MedDiet" type="number" step="1" min="0" max="14" placeholder="7">
-          <label>Ultraprocesados (veces/sem)</label><input id="Ultra" type="number" step="1" min="0" placeholder="">
+          <div class="stack">
+            <label>Adherencia Dieta Mediterránea (0–14)</label>
+            <input id="MedDiet" type="number" step="1" min="0" max="14" placeholder="7">
+            <button class="btn small" onclick="openMED()">Rellenar Dieta Mediterránea</button>
+          </div>
+          <div class="stack">
+            <label>Ultraprocesados (veces/sem)</label>
+            <input id="Ultra" type="number" step="1" min="0" placeholder="">
+            <button class="btn small" onclick="openUPF()">Checklist ultraprocesados</button>
+          </div>
           <label>Alcohol (unidades/sem)</label><input id="AlcoholU" type="number" step="1" min="0" placeholder="">
         </div>
       </div>
@@ -204,21 +317,57 @@
         <div class="col-3"><div class="muted">Actividad Aeróbica</div><progress id="prog_aero" max="1" value="0"></progress><div class="muted" id="txt_aero">–</div></div>
         <div class="col-3"><div class="muted">Entrenamiento de Fuerza</div><progress id="prog_strength" max="1" value="0"></progress><div class="muted" id="txt_strength">–</div></div>
         <div class="col-3"><div class="muted">Nutrición / Mediterránea</div><progress id="prog_diet" max="1" value="0"></progress><div class="muted" id="txt_diet">–</div></div>
-        <div class="col-3"><div class="muted">Notas</div><div class="muted">Cada módulo extendido tiene tope ±1 año para controlar ruido.</div></div>
+        <div class="col-3"><div class="muted">Antecedentes obstétricos</div><progress id="prog_preg" max="1" value="0"></progress><div class="muted" id="txt_preg">–</div></div>
       </div>
     </section>
   </div>
+  <div class="grid">
+    <section class="card col-12">
+      </section>
+    
+    <section class="card col-12">
+      <h2>Plan y recomendaciones</h2>
+      <ul id="recoList" class="muted" style="margin:6px 0 0 18px"></ul>
+    </section>
+
+    <section class="card col-12">
+      <h2>Evolución del paciente</h2>
+      <div id="evoEmpty" class="muted">Aún no hay visitas registradas. Usa “Registrar visita”.</div>
+      <div id="evoChart" style="width:100%;height:260px"></div>
+    </section>
+</div>
 </main>
+
+<div id="modal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="modal-card">
+    <div class="modal-head"><h3 id="modalTitle">Cuestionario</h3><button class="modal-close" onclick="closeModal()">×</button></div>
+    <div id="modalBody" class="modal-body"></div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeModal()">Cancelar</button>
+      <button class="btn" onclick="submitQuiz()">Usar puntuación</button>
+    </div>
+  </div>
+</div>
 
 <footer>
   © 2025 ThymeAge · Created by Dra. Antonela Costa Varsi
 </footer>
 
 <script>
-function val(id){ const el=document.getElementById(id); return el ? el.value : ""; }
-function clamp(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
-function has(v){ return v!==null && v!=="" && !isNaN(parseFloat(v)); }
-function n(v){ return parseFloat(v); }
+/* Helpers */
+(function(){
+  function val(id){ const el=document.getElementById(id); return el ? el.value : ""; }
+  function set(id, v){ const el=document.getElementById(id); if(el!=null) el.value=v; }
+  function clamp(x, lo, hi){ return Math.max(lo, Math.min(hi, x)); }
+  function has(v){
+    if(v===null || v===undefined) return false;
+    if(typeof v==='number') return !Number.isNaN(v);
+    if(typeof v==='string') return v.trim()!=='' && !Number.isNaN(parseFloat(v));
+    return false;
+  }
+  function n(v){ const x=parseFloat(v); return Number.isNaN(x)? NaN : x; }
+  window.val=val; window.set=set; window.clamp=clamp; window.has=has; window.n=n;
+})();
 
 function norms(sex){
   const t={female:{SBP_m:120,SBP_s:15,ApoB_m:100,ApoB_s:30,nHDL_m:130,nHDL_s:30,A1c_m:5.3,A1c_s:0.4,FPG_m:90,FPG_s:10,eGFR_m:100,eGFR_s:15,CRP_m:1.5,CRP_s:1.5,WHtR_m:0.50,WHtR_s:0.06,RHR_m:70,RHR_s:10,VO2_m:35,VO2_s:7,Grip_m:28,Grip_s:6},
@@ -227,10 +376,9 @@ function norms(sex){
 }
 function weights(){ return {cardiomet:0.50, fitness:0.25, anthro:0.15, smoke:0.10, sleep:0.06, stress:0.06, aero:0.05, strength:0.05, diet:0.08}; }
 function scalars(){ return {k:2.5, cap_z:2.5, cap_sleep:1.0, cap_stress:1.0, cap_aero:1.0, cap_strength:1.0, cap_diet:1.0, unc_core:2.5, unc_ext:0.8}; }
-
 function z_worse(v, m, s, cap){ if(!has(v)) return null; return clamp((n(v)-m)/s, -cap, cap); }
 function z_better(v, m, s, cap){ if(!has(v)) return null; return clamp(-(n(v)-m)/s, -cap, cap); }
-function avg(arr){ const v=arr.filter(x=>x!==null && !isNaN(x)); return v.length? v.reduce((a,b)=>a+b,0)/v.length : null; }
+function avg(arr){ const v=arr.filter(x=>x!==null && !Number.isNaN(x)); return v.length? v.reduce((a,b)=>a+b,0)/v.length : null; }
 
 function computeAll(){
   const sex = val("sex"); const age = has(val("age"))? n(val("age")) : 40;
@@ -245,12 +393,12 @@ function computeAll(){
   const z_FPG = (!has(val("A1c")) && has(val("FPG")))? z_worse(val("FPG"), N.FPG_m, N.FPG_s, S.cap_z) : null;
   const z_gly = z_A1c!==null ? z_A1c : (z_FPG!==null ? z_FPG : null);
   const z_eGFR = z_better(val("eGFR"), N.eGFR_m, N.eGFR_s, S.cap_z);
-  const z_CRP = has(val("CRP")) ? z_worse(val("CRP"), N.CRP_m, N.CRP_s, S.cap_z) : null;
   const WHtR = (has(val("waist")) && has(val("height")) && n(val("height"))>0) ? (n(val("waist"))/n(val("height"))) : null;
   const z_WHtR = (WHtR!==null) ? z_worse(WHtR, N.WHtR_m, N.WHtR_s, S.cap_z) : null;
   const z_RHR = z_worse(val("RHR"), N.RHR_m, N.RHR_s, S.cap_z);
   const z_VO2 = z_better(val("VO2"), N.VO2_m, N.VO2_s, S.cap_z);
   const z_Grip= z_better(val("grip"), N.Grip_m, N.Grip_s, S.cap_z);
+  const z_CRP = z_worse(val("CRP"), N.CRP_m, N.CRP_s, S.cap_z);
   const z_smoke = (function(s){ if(s==="never") return 0; if(s==="former") return 0.25; if(s==="current") return 0.75; return 0; })(val("smoke"));
 
   const z_cardio = avg([z_SBP, z_lip, z_gly, z_eGFR, z_CRP]);
@@ -270,7 +418,7 @@ function computeAll(){
     const p=document.getElementById(id), t=document.getElementById(txtId);
     if(z===null){ p.value=0; t.innerText="sin datos"; return; }
     const val=(z+S.cap_z)/(2*S.cap_z); p.value=val;
-    const yrs=(w*z)*S.k; t.innerText=`z=${z.toFixed(2)} · contrib ≈ ${yrs.toFixed(2)} años`;
+    const yrs=(w*z)*S.k; t.innerText=`z=${(z??0).toFixed(2)} · contrib ≈ ${yrs.toFixed(2)} años`;
   }
   setProg("prog_cardiomet","txt_cardiomet",z_cardio??0,(z_cardio===null?0:W.cardiomet/sumW));
   setProg("prog_fitness","txt_fitness",z_fit??0,(z_fit===null?0:W.fitness/sumW));
@@ -284,14 +432,17 @@ function computeAll(){
     if(has(val("AHI")) && n(val("AHI"))>=15) pts+=0.8;
     if(has(val("ODI")) && n(val("ODI"))>=5) pts+=0.6;
     if(val("STOP")==="si") pts+=0.4;
-    return clamp(pts,-S.cap_sleep,S.cap_sleep);
+    return clamp(pts,-scalars().cap_sleep,scalars().cap_sleep);
   }
   function stressYears(){
     let pts=0;
-    if(has(val("PSS")) && n(val("PSS"))>=20) pts+=0.5;
-    if(has(val("PHQ")) && n(val("PHQ"))>=10) pts+=0.5;
-    if(has(val("GAD")) && n(val("GAD"))>=10) pts+=0.5;
-    return clamp(pts,-S.cap_stress,S.cap_stress);
+    const PSS=n(val("PSS"));
+    const PHQ=n(val("PHQ"));
+    const GAD=n(val("GAD"));
+    if(has(PSS) && PSS>=20) pts+=0.5;
+    if(has(PHQ) && PHQ>=10) pts+=0.5;
+    if(has(GAD) && GAD>=10) pts+=0.5;
+    return clamp(pts,-scalars().cap_stress,scalars().cap_stress);
   }
   function aeroYears(){
     let pts=0;
@@ -300,7 +451,7 @@ function computeAll(){
       if(m<75) pts+=0.35; else if(m>=150) pts-=0.15;
       if(m>=300) pts-=0.25;
     }
-    return clamp(pts,-S.cap_aero,S.cap_aero);
+    return clamp(pts,-scalars().cap_aero,scalars().cap_aero);
   }
   function strengthYears(){
     let pts=0;
@@ -310,7 +461,7 @@ function computeAll(){
       else if(d===2) pts-=0.1;
       else if(d>=3) pts-=0.25;
     }
-    return clamp(pts,-S.cap_strength,S.cap_strength);
+    return clamp(pts,-scalars().cap_strength,scalars().cap_strength);
   }
   function dietYears(){
     let pts=0;
@@ -332,11 +483,22 @@ function computeAll(){
       const modMax = (sex==="female")?7:14;
       if(a>modMax) pts+=0.5;
     }
-    return clamp(pts,-S.cap_diet,S.cap_diet);
+    return clamp(pts,-scalars().cap_diet,scalars().cap_diet);
   }
 
   const yrs_sleep=sleepYears(), yrs_stress=stressYears(), yrs_aero=aeroYears(), yrs_strength=strengthYears(), yrs_diet=dietYears();
-  const add_modules = yrs_sleep + yrs_stress + yrs_aero + yrs_strength + yrs_diet;
+  function pregnancyYears(){
+    if(val("sex")!=="female") return 0;
+    let pts=0;
+    // pequeñas penalizaciones basadas en riesgo CVD a futuro
+    if(document.getElementById("hx_GHTN")?.checked) pts+=0.30;
+    if(document.getElementById("hx_GDM")?.checked) pts+=0.30;
+    if(document.getElementById("hx_Preeclampsia")?.checked) pts+=0.50;
+    return clamp(pts, 0, 1.0); // tope +1.0 año
+  }
+
+  const yrs_preg = pregnancyYears();
+  const add_modules = yrs_sleep + yrs_stress + yrs_aero + yrs_strength + yrs_diet + yrs_preg;
   const delta_ext = delta_core + add_modules;
   const age_ext = age + delta_ext;
 
@@ -345,13 +507,13 @@ function computeAll(){
     const val=(yrs+cap)/(2*cap); p.value=val;
     t.innerText=`impacto ≈ ${yrs.toFixed(2)} años (tope ±${cap})`;
   }
-  setProgExt("prog_sleep","txt_sleep",yrs_sleep, S.cap_sleep);
-  setProgExt("prog_stress","txt_stress",yrs_stress, S.cap_stress);
-  setProgExt("prog_aero","txt_aero",yrs_aero, S.cap_aero);
-  setProgExt("prog_strength","txt_strength",yrs_strength, S.cap_strength);
-  setProgExt("prog_diet","txt_diet",yrs_diet, S.cap_diet);
+  setProgExt("prog_sleep","txt_sleep",yrs_sleep, scalars().cap_sleep);
+  setProgExt("prog_stress","txt_stress",yrs_stress, scalars().cap_stress);
+  setProgExt("prog_aero","txt_aero",yrs_aero, scalars().cap_aero);
+  setProgExt("prog_strength","txt_strength",yrs_strength, scalars().cap_strength);
+  setProgExt("prog_diet","txt_diet",yrs_diet, scalars().cap_diet);
+  setProgExt("prog_preg","txt_preg",yrs_preg, 1.0);
 
-  // KPIs y CIs
   document.getElementById("age_core").innerText = age_core.toFixed(1)+" años";
   document.getElementById("age_ext").innerText  = age_ext.toFixed(1)+" años";
   document.getElementById("delta_core").innerText = (delta_core>=0?"+":"") + delta_core.toFixed(2)+" a";
@@ -359,11 +521,10 @@ function computeAll(){
   document.getElementById("age_core_ci").innerText = "± " + scalars().unc_core.toFixed(1) + " años";
   document.getElementById("age_ext_ci").innerText  = "± " + (scalars().unc_core + scalars().unc_ext).toFixed(1) + " años";
 
-  // Núcleo: color + halo + sonido opcional
   const bubble = document.getElementById("bubble");
   const halo = document.getElementById("halo");
   const bubbleNumber = document.getElementById("bubbleNumber");
-  const diff = age_ext - age;
+  const diff = age_ext - (has(val("age"))? n(val("age")): age);
   let cls="good", caption="";
   if(diff <= -0.5){ cls="good"; caption = "Tu cuerpo se siente más joven"; }
   else if(diff > -0.5 && diff <= 3){ cls="warn"; caption = "Ligero exceso de edad-salud"; }
@@ -372,30 +533,225 @@ function computeAll(){
   halo.className = "halo " + cls;
   bubbleNumber.textContent = age_ext.toFixed(1);
   document.getElementById("bubbleCaption").textContent = caption;
+  try{ buildRecommendations(diff); }catch(_){}
+}
 
-  // Sonido opcional (suave) si resultado es óptimo (< -1 año)
-  if(document.getElementById("soundOn").checked && diff <= -1){
-    try{
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = "sine";
-      o.frequency.setValueAtTime(520, ctx.currentTime);
-      g.gain.setValueAtTime(0.0001, ctx.currentTime);
-      g.gain.linearRampToValueAtTime(0.06, ctx.currentTime + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.25);
-      o.connect(g).connect(ctx.destination);
-      o.start();
-      o.stop(ctx.currentTime + 0.26);
-    }catch(e){ /* silencio si navegador bloquea */ }
+/* ===== Shared modal ===== */
+const modal=document.getElementById('modal');
+const modalBody=document.getElementById('modalBody');
+const modalTitle=document.getElementById('modalTitle');
+let currentQuiz=null;
+
+function openModal(){ 
+  modal.classList.add('open'); 
+  // ESC to close
+  document.addEventListener('keydown', escHandler);
+}
+function closeModal(){ 
+  modal.classList.remove('open'); 
+  modalBody.innerHTML=''; currentQuiz=null; 
+  document.removeEventListener('keydown', escHandler);
+}
+function escHandler(e){ if(e.key==='Escape'){ closeModal(); } }
+// Backdrop click to close
+modal.addEventListener('click', (ev)=>{ if(ev.target===modal){ closeModal(); } });
+
+function submitQuiz(){
+  if(!currentQuiz) return;
+  if(currentQuiz==='UPF'){
+    let total=0;
+    document.querySelectorAll('#modalBody input[type=number]').forEach(inp=>{
+      const v=parseInt(inp.value||'0',10); if(!Number.isNaN(v)) total+=v;
+    });
+    set('Ultra', total);
+  }else if(currentQuiz==='MED'){
+    // PREDIMED: suma de 14 ítems sí/no
+    let score=0;
+    document.querySelectorAll('#modalBody input[type=radio]:checked').forEach(r=>score+=parseInt(r.value));
+    set('MedDiet', score);
+  }else{
+    let score=0;
+    document.querySelectorAll('#modalBody input[type=radio]:checked').forEach(r=>score+=parseInt(r.value));
+    if(currentQuiz==='PSS') set('PSS', score);
+    if(currentQuiz==='PHQ') set('PHQ', score);
+    if(currentQuiz==='GAD') set('GAD', score);
+    if(currentQuiz==='STOP'){ set('STOP', score>=3 ? 'si' : 'no'); }
   }
+  closeModal();
+  computeAll();
+}
+
+function makeLikert(name, items, labels){
+  modalBody.innerHTML='';
+  items.forEach((txt, i)=>{
+    const div=document.createElement('div'); div.className='q';
+    const id=name+'_'+i;
+    div.innerHTML=`<label>${i+1}. ${txt}</label>
+    <div class="opts">
+      ${labels.map((lab, idx)=>`<label><input type="radio" name="${id}" value="${idx}"> ${lab}</label>`).join('')}
+    </div>`;
+    modalBody.appendChild(div);
+  });
+  openModal();
+}
+
+/* PSS / PHQ / GAD */
+function openPSS(){
+  currentQuiz='PSS';
+  modalTitle.textContent='PSS-10 · Perceived Stress Scale';
+  const items=[
+    'En el último mes, ¿con qué frecuencia te has sentido molesta por algo inesperado?',
+    'En el último mes, ¿con qué frecuencia has sentido que no podías controlar cosas importantes en tu vida?',
+    '¿Con qué frecuencia te has sentido nerviosa o “estresada”?',
+    '¿Con qué frecuencia has manejado con éxito los pequeños problemas irritantes de la vida?',
+    '¿Con qué frecuencia has sentido que todo iba según lo planeado?',
+    '¿Con qué frecuencia has sentido que no podías afrontar todas las cosas que tenías que hacer?',
+    '¿Con qué frecuencia has podido controlar las molestias en tu vida?',
+    '¿Con qué frecuencia te has sentido al mando de las situaciones?',
+    '¿Con qué frecuencia te has enfadado porque las cosas estaban fuera de tu control?',
+    '¿Con qué frecuencia has sentido que tus dificultades se acumulaban tanto que no podías superarlas?'
+  ];
+  const labels=['Nunca (0)','Casi nunca (1)','A veces (2)','A menudo (3)','Muy a menudo (4)'];
+  makeLikert('PSS', items, labels);
+}
+function openPHQ(){
+  currentQuiz='PHQ';
+  modalTitle.textContent='PHQ-9 · Depresión';
+  const items=[
+    'Poco interés o placer en hacer cosas',
+    'Se ha sentido decaída, deprimida o sin esperanza',
+    'Dificultad para dormir o dormir demasiado',
+    'Cansancio o falta de energía',
+    'Poco apetito o comer en exceso',
+    'Se siente mal consigo misma o que ha fracasado',
+    'Dificultad para concentrarse',
+    'Se mueve o habla muy lento, o por el contrario, demasiado inquieta',
+    'Pensamientos de que estaría mejor muerta o de hacerse daño'
+  ];
+  const labels=['Nunca (0)','Varios días (1)','Más de la mitad de los días (2)','Casi todos los días (3)'];
+  makeLikert('PHQ', items, labels);
+}
+function openGAD(){
+  currentQuiz='GAD';
+  modalTitle.textContent='GAD-7 · Ansiedad';
+  const items=[
+    'Sentirse nerviosa, ansiosa o al límite',
+    'No poder parar o controlar la preocupación',
+    'Preocuparse demasiado por diferentes cosas',
+    'Dificultad para relajarse',
+    'Estar tan inquieta que es difícil permanecer quieta',
+    'Enfadarse o irritarse fácilmente',
+    'Sentir miedo como si algo terrible fuera a pasar'
+  ];
+  const labels=['Nunca (0)','Varios días (1)','Más de la mitad de los días (2)','Casi todos los días (3)'];
+  makeLikert('GAD', items, labels);
+}
+
+/* STOP-BANG (8 sí/no) */
+function openSTOP(){
+  currentQuiz='STOP';
+  modalTitle.textContent='STOP‑BANG · Riesgo de apnea del sueño';
+  const items=[
+    '¿Ronca fuerte (más fuerte que hablar o que se oiga a través de puertas cerradas)?',
+    '¿Se siente cansada, fatigada o somnolienta durante el día?',
+    '¿Alguien ha observado que deja de respirar durante el sueño?',
+    '¿Tiene presión arterial alta o está en tratamiento para hipertensión?',
+    'IMC > 35 kg/m² (si no sabe, deje en blanco)',
+    'Edad > 50 años',
+    'Circunferencia de cuello grande (≥ 40 cm en mujeres / ≥ 43 cm en hombres)',
+    'Sexo masculino'
+  ];
+  modalBody.innerHTML='';
+  items.forEach((txt, i)=>{
+    const div=document.createElement('div'); div.className='q';
+    const id='STOP_'+i;
+    div.innerHTML=`<label>${i+1}. ${txt}</label>
+    <div class="opts">
+      <label><input type="radio" name="${id}" value="1"> Sí</label>
+      <label><input type="radio" name="${id}" value="0"> No</label>
+    </div>`;
+    modalBody.appendChild(div);
+  });
+  const note=document.createElement('div'); note.className='muted'; note.style.marginTop='8px';
+  note.textContent='Nota: STOP‑BANG es cribado. ≥3 puntos sugiere alto riesgo y puede requerir evaluación formal.';
+  modalBody.appendChild(note);
+  openModal();
+}
+
+/* Ultraprocesados checklist */
+function openUPF(){
+  currentQuiz='UPF';
+  modalTitle.textContent='Checklist de ultraprocesados (veces por semana)';
+  const items=[
+    'Refrescos/colas/energéticas azucaradas',
+    'Bollería industrial (facturas, donuts, croissants envasados)',
+    'Snacks salados (patatas fritas/cheetos)',
+    'Carnes procesadas (salchichas, fiambres)',
+    'Comidas listas/precocinadas (pizza congelada, lasaña)',
+    'Cereales de desayuno azucarados',
+    'Yogures azucarados/postres lácteos',
+    'Helados/polos industriales',
+    'Salsas industriales (ketchup, mayonesa, BBQ)',
+    'Pan de molde industrial',
+    'Barritas/galletitas dulces',
+    'Bebidas “light/diet” (edulcoradas)'
+  ];
+  modalBody.innerHTML='';
+  const wrap=document.createElement('div'); wrap.className='upf-grid';
+  items.forEach((name, i)=>{
+    const rowLbl=document.createElement('div'); rowLbl.textContent = (i+1)+'. '+name;
+    const rowInp=document.createElement('input'); rowInp.type='number'; rowInp.min='0'; rowInp.step='1'; rowInp.placeholder='0'; rowInp.value='0';
+    wrap.appendChild(rowLbl); wrap.appendChild(rowInp);
+  });
+  modalBody.appendChild(wrap);
+  const help=document.createElement('div'); help.className='muted'; help.style.marginTop='8px';
+  help.textContent='Suma total = veces por semana. Al guardar, se rellena “Ultraprocesados (veces/sem)”.';
+  modalBody.appendChild(help);
+  openModal();
+}
+
+/* MedDiet (PREDIMED 14 ítems) */
+function openMED(){
+  currentQuiz='MED';
+  modalTitle.textContent='Dieta Mediterránea · PREDIMED (14 ítems)';
+  const items=[
+    '¿Usa aceite de oliva como principal grasa para cocinar?',
+    '¿Consume ≥4 cucharadas de aceite de oliva al día (incluyendo en crudo/cocción)?',
+    '¿Come ≥2 raciones de verduras al día?',
+    '¿Consume ≥3 piezas de fruta al día?',
+    '¿Come <1 ración/día de carnes rojas o embutidos?',
+    '¿Consume <1 ración/día de mantequilla, margarina o nata?',
+    '¿Bebe <1 refresco azucarado al día?',
+    '¿Consume ≥7 raciones/sem de vino tinto con las comidas? (si no bebe, responda “No”)',
+    '¿Come ≥3 raciones/sem de legumbres?',
+    '¿Consume ≥3 raciones/sem de pescado o marisco?',
+    '¿Come <3 raciones/sem de bollería industrial?',
+    '¿Consume ≥3 raciones/sem de frutos secos?',
+    '¿Prefiere pollo, pavo o conejo frente a ternera/cerdo?',
+    '¿Usa ≥2 veces/sem sofrito (aceite de oliva + tomate/verduras)?'
+  ];
+  modalBody.innerHTML='';
+  items.forEach((txt, i)=>{
+    const div=document.createElement('div'); div.className='q';
+    const id='MED_'+i;
+    div.innerHTML=`<label>${i+1}. ${txt}</label>
+    <div class="opts">
+      <label><input type="radio" name="${id}" value="1"> Sí</label>
+      <label><input type="radio" name="${id}" value="0"> No</label>
+    </div>`;
+    modalBody.appendChild(div);
+  });
+  const note=document.createElement('div'); note.className='muted'; note.style.marginTop='8px';
+  note.textContent='Puntuación 0–14 (≥10 alta, 7–9 moderada, ≤6 baja). Al guardar, se rellena “Adherencia Dieta Mediterránea”.';
+  modalBody.appendChild(note);
+  openModal();
 }
 
 function saveJSON(){
   const ids=["sex","age","SBP","ApoB","nonHDL","A1c","FPG","eGFR","CRP","waist","height","RHR","VO2","grip","smoke","TST","SE","AHI","ODI","STOP","PSS","PHQ","GAD","MVPA","STR","MedDiet","Ultra","AlcoholU"];
   const obj={}; ids.forEach(id=>obj[id]=val(id));
   const blob = new Blob([JSON.stringify(obj,null,2)],{type:"application/json"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="thymeage_v2_2_inputs.json"; a.click();
+  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="thymeage_v2_5_inputs.json"; a.click();
 }
 function loadJSON(){
   const inp=document.createElement("input"); inp.type="file"; inp.accept=".json,application/json";
@@ -407,32 +763,461 @@ function loadJSON(){
   inp.click();
 }
 
-window.addEventListener("DOMContentLoaded", ()=>{
-  document.getElementById("sex").value="female";
-  document.getElementById("age").value=39;
-  document.getElementById("SBP").value=118;
-  document.getElementById("nonHDL").value=130;
-  document.getElementById("A1c").value=5.2;
-  document.getElementById("eGFR").value=110;
-  document.getElementById("CRP").value=1.2;
-  document.getElementById("waist").value=72;
-  document.getElementById("height").value=165;
-  document.getElementById("RHR").value=64;
-  document.getElementById("VO2").value=36;
-  document.getElementById("grip").value=28;
-  document.getElementById("smoke").value="never";
-  document.getElementById("TST").value=7.0;
-  document.getElementById("SE").value=88;
-  document.getElementById("STOP").value="no";
-  document.getElementById("PSS").value=14;
-  document.getElementById("PHQ").value=3;
-  document.getElementById("GAD").value=3;
-  document.getElementById("MVPA").value=150;
-  document.getElementById("STR").value=2;
-  document.getElementById("MedDiet").value=7;
-  document.getElementById("Ultra").value=3;
-  document.getElementById("AlcoholU").value=2;
+
+/* ===== Perfíl de Paciente (localStorage) ===== */
+function fieldIds(){
+  return ["patientName","patientId","visitDate","patientNotes","goalMethod","goalWeight","planNotes","hx_GHTN","hx_GDM","hx_Preeclampsia","lastPregYear","sex","age","weight","SBP","ApoB","nonHDL","A1c","FPG","eGFR","CRP","waist","height","RHR","VO2","grip","smoke","TST","SE","AHI","ODI","STOP","PSS","PHQ","GAD","MVPA","STR","MedDiet","Ultra","AlcoholU"];
+}
+function readForm(){
+  const obj={};
+  fieldIds().forEach(id=>{ const el=document.getElementById(id); if(el) obj[id]=el.value; });
+  obj.__updated = new Date().toISOString();
+  return obj;
+}
+function writeForm(data){
+  if(!data) return;
+  Object.keys(data).forEach(k=>{ const el=document.getElementById(k); if(el && k!=="__updated") el.value=data[k]; });
   computeAll();
+}
+function getProfiles(){
+  try{ return JSON.parse(localStorage.getItem("thymeage_profiles")||"{}"); }catch(e){ return {}; }
+}
+function setProfiles(p){ localStorage.setItem("thymeage_profiles", JSON.stringify(p)); }
+function refreshProfileList(selected){
+  const sel = document.getElementById("profileSelect"); if(!sel) return;
+  const profiles = getProfiles();
+  const names = Object.keys(profiles).sort((a,b)=>a.localeCompare(b));
+  sel.innerHTML = '<option value="">— Pacientes —</option>' + names.map(n=>`<option value="${n}">${n}</option>`).join('');
+  if(selected){ sel.value = selected; }
+}
+function saveProfile(){
+  const name = (val("patientName")||"").trim();
+  if(!name){ alert("Escribe un nombre de paciente para guardar."); return; }
+  const profiles = getProfiles();
+  profiles[name] = readForm();
+  setProfiles(profiles);
+  localStorage.setItem("thymeage_last_patient", name);
+  refreshProfileList(name);
+  alert("Paciente guardado: " + name);
+}
+function loadProfile(name){
+  const profiles = getProfiles();
+  if(!name || !profiles[name]){ alert("Selecciona un paciente guardado."); return; }
+  writeForm(profiles[name]);
+  document.getElementById("patientName").value = name;
+  localStorage.setItem("thymeage_last_patient", name);
+}
+function deleteProfile(name){
+  const profiles = getProfiles();
+  if(!name || !profiles[name]){ alert("Selecciona un paciente para borrar."); return; }
+  if(!confirm("¿Borrar el paciente '" + name + "'? Esta acción no se puede deshacer.")) return;
+  delete profiles[name];
+  setProfiles(profiles);
+  const last = localStorage.getItem("thymeage_last_patient");
+  if(last===name) localStorage.removeItem("thymeage_last_patient");
+  refreshProfileList();
+  alert("Paciente borrado.");
+}
+function loadSelectedProfile(){ const n=val("profileSelect"); loadProfile(n); renderEvolution(n); }
+function deleteSelectedProfile(){ const n=val("profileSelect"); deleteProfile(n); }
+
+
+/* ===== Exportar / Importar perfiles ===== */
+function exportProfiles(){
+  const data = getProfiles();
+  const blob = new Blob([JSON.stringify({version:"2.7", exported_at:new Date().toISOString(), profiles:data}, null, 2)], {type:"application/json"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="thymeage_profiles_v2_7.json";
+  a.click();
+}
+function importProfiles(){
+  const inp=document.createElement("input");
+  inp.type="file"; inp.accept=".json,application/json";
+  inp.onchange = e=>{
+    const file=e.target.files[0]; if(!file) return;
+    const reader = new FileReader();
+    reader.onload = ev=>{
+      try{
+        const data = JSON.parse(ev.target.result);
+        const profiles = data.profiles || data || {};
+        const existing = getProfiles();
+        // Merge (existing wins on key conflict unless confirmed)
+        let merged = {...existing};
+        for(const name of Object.keys(profiles)){
+          if(existing[name]){
+            const overwrite = confirm("El paciente '"+name+"' ya existe. ¿Deseas sobreescribirlo?");
+            if(!overwrite) continue;
+          }
+          merged[name] = profiles[name];
+        }
+        setProfiles(merged);
+        refreshProfileList();
+        alert("Perfiles importados correctamente.");
+      }catch(err){
+        alert("Archivo inválido. Asegúrate de seleccionar un JSON exportado por ThymeAge.");
+      }
+    };
+    reader.readAsText(file);
+  };
+  inp.click();
+}
+
+
+/* Duplicar paciente */
+function duplicateProfile(){
+  const currName = (val("patientName")||"").trim();
+  const profiles = getProfiles();
+  if(!currName || !profiles[currName]){
+    const proceed = confirm("No hay un paciente guardado con este nombre. ¿Deseas guardar el actual primero?");
+    if(!proceed) return;
+    saveProfile();
+  }
+  const newName = prompt("Nuevo nombre para el duplicado:", currName ? currName + " (seguimiento)" : "");
+  if(!newName) return;
+  const data = readForm();
+  const all = getProfiles();
+  all[newName] = data;
+  setProfiles(all);
+  refreshProfileList(newName);
+  document.getElementById("patientName").value = newName;
+  alert("Se duplicó el paciente como: " + newName);
+}
+
+/* Mostrar/ocultar bloque obstétrico según sexo */
+function updateObBlock(){
+  const ob = document.getElementById("obHistory");
+  if(!ob) return;
+  ob.style.display = (val("sex")==="female") ? "block" : "none";
+}
+document.addEventListener("change", (e)=>{
+  if(e.target && e.target.id==="sex"){ updateObBlock(); }
+});
+
+
+
+/* ===== Cálculo de objetivo de peso ===== */
+function heightMeters(){
+  const h = n(val("height"));
+  return has(h) ? h/100.0 : NaN;
+}
+function currentWeight(){ const w=n(val("weight")); return has(w) ? w : NaN; }
+
+function autoGoalWeight(){
+  const method = val("goalMethod")||"clinical";
+  const goalEl = document.getElementById("goalWeight");
+  if(!goalEl) return;
+  if(method==="clinical"){
+    goalEl.removeAttribute("readonly");
+    return; // no auto
+  }
+  const h = heightMeters();
+  const w = currentWeight();
+  let target = NaN;
+  if(method==="bmi22" && has(h)){
+    target = 22.0 * h*h;
+  }else if(method==="bmi249" && has(h)){
+    target = 24.9 * h*h;
+  }else if(method==="minus5" && has(w)){
+    target = w * 0.95;
+  }else if(method==="minus10" && has(w)){
+    target = w * 0.90;
+  }
+  if(!Number.isNaN(target)){
+    goalEl.value = target.toFixed(1);
+    goalEl.setAttribute("readonly","readonly");
+  }else{
+    goalEl.removeAttribute("readonly");
+  }
+}
+document.addEventListener("change", (e)=>{
+  if(e.target && (e.target.id==="goalMethod" || e.target.id==="height" || e.target.id==="weight")){
+    autoGoalWeight();
+  }
+});
+document.addEventListener("input", (e)=>{
+  if(e.target && (e.target.id==="height" || e.target.id==="weight")){
+    autoGoalWeight();
+  }
+});
+
+/* ===== Recomendaciones dinámicas y evolución ===== */
+function isGoodBP(){ const s=n(val("SBP")); return has(s) && s<130; }
+function isGoodGly(){ const a=n(val("A1c")); const g=n(val("FPG")); if(has(a)) return a<5.7; if(has(g)) return g<100; return false; }
+function isGoodLipid(){ const ap=n(val("ApoB")); const nh=n(val("nonHDL")); if(has(ap)) return ap<90; if(has(nh)) return nh<130; return false; }
+
+function yearsSincePreg(){
+  const y = parseInt(val("lastPregYear")||"");
+  if(Number.isNaN(y)) return null;
+  const now = new Date().getFullYear();
+  return Math.max(0, now - y);
+}
+
+function pregnancyYears(){
+  if(val("sex")!=="female") return 0;
+  let base=0;
+  if(document.getElementById("hx_GHTN")?.checked) base+=0.30;
+  if(document.getElementById("hx_GDM")?.checked) base+=0.30;
+  if(document.getElementById("hx_Preeclampsia")?.checked) base+=0.50;
+
+  if(base<=0) return 0;
+  // Atenuación por tiempo desde el último embarazo
+  const yrs = yearsSincePreg();
+  let atten = 1.0;
+  if(yrs!==null){
+    if(yrs <= 5) atten = 1.0;
+    else if(yrs <= 15) atten = 0.6;
+    else atten = 0.3;
+  }
+  // Reducción por control actual
+  let controlFactor = 1.0;
+  let good = 0, total=0;
+  if(isGoodBP()){ good++; } total++;
+  if(isGoodGly()){ good++; } total++;
+  if(isGoodLipid()){ good++; } total++;
+  if(total>0){
+    const pct = good/total;
+    // si >=2 de 3 están bien, reducimos 30%
+    if(pct>=0.66) controlFactor = 0.7;
+    // si todo bien, reducimos 40%
+    if(pct===1.0) controlFactor = 0.6;
+  }
+  return clamp(base * atten * controlFactor, 0, 1.0);
+}
+
+function buildRecommendations(diffExt){
+  const ul = document.getElementById("recoList");
+  if(!ul) return;
+  const items=[];
+
+  // Obstétricos
+  const anyOb = (document.getElementById("hx_GHTN")?.checked ||
+                 document.getElementById("hx_GDM")?.checked ||
+                 document.getElementById("hx_Preeclampsia")?.checked);
+  if(val("sex")==="female" && anyOb){
+    items.push("Antecedentes obstétricos de riesgo: priorizar control de TA, glucosa y lípidos; seguimiento anual.");
+    const yrs=yearsSincePreg();
+    if(yrs!==null && yrs<=5) items.push("Último embarazo reciente: refuerza cribado cardiometabólico en próximos años.");
+  }
+
+  // TA
+  if(has(val("SBP")) && n(val("SBP"))>=130) items.push("Revisar manejo de hipertensión (objetivo PAS <130 mmHg si es apropiado).");
+  // Glucosa
+  const a1c = n(val("A1c")); const fpg = n(val("FPG"));
+  if((has(a1c) && a1c>=5.7) || (has(fpg) && fpg>=100)) items.push("Optimizar control glucémico (meta HbA1c <5.7% si no DM).");
+  // Lípidos
+  const ap=n(val("ApoB")), nh=n(val("nonHDL"));
+  if((has(ap) && ap>=90) || (!has(ap) && has(nh) && nh>=130)) items.push("Meta lipídica: ApoB <90 mg/dL (o no-HDL <130 mg/dL) según riesgo.");
+
+  // Sueño
+  if(has(val("TST")) && (n(val("TST"))<6 || n(val("TST"))>9)) items.push("Ajustar duración de sueño hacia 7–9 h.");
+  if(has(val("SE")) && n(val("SE"))<85) items.push("Mejorar eficiencia de sueño; valorar higiene de sueño y apnea.");
+  if(val("STOP")==="si") items.push("STOP‑BANG alto: considerar estudio de sueño formal.");
+
+  // Actividad
+  const mvpa=n(val("MVPA"));
+  if(has(mvpa) && mvpa<150) items.push("Aumentar actividad aeróbica hasta ≥150 min/sem de MVPA.");
+  const str=n(val("STR"));
+  if(has(str) && str<2) items.push("Añadir ≥2 sesiones/sem de fuerza.");
+  // Dieta
+  const md=n(val("MedDiet")), ultra=n(val("Ultra"));
+  if(has(md) && md<10) items.push("Mejorar adherencia a Dieta Mediterránea (objetivo ≥10/14).");
+  if(has(ultra) && ultra>=3) items.push("Reducir ultraprocesados (ideal <3 veces/sem).");
+
+  // Peso objetivo
+  const gw = n(val("goalWeight"));
+const w = n(val("weight"));
+const ht = n(val("height"));
+if (has(gw) && has(w) && has(ht)) {
+  const bmi = w / Math.pow(ht/100, 2);
+  const gap = w - gw;
+  if (gap > 0.1) items.push(`Objetivo de peso: bajar ~${gap.toFixed(1)} kg (IMC actual ~${bmi.toFixed(1)}).`);
+}
+
+
+  // Resultado general
+  if(diffExt>3) items.push("Envejecimiento acelerado: priorizar palancas con mayor impacto individual.");
+
+  ul.innerHTML = items.length ? items.map(t=>`<li>${t}</li>`).join("") : "<li>No hay recomendaciones específicas. ¡Buen trabajo!</li>";
+}
+
+function ensureVisits(name){
+  const profiles = getProfiles();
+  if(!profiles[name].__visits) profiles[name].__visits = [];
+  return profiles;
+}
+
+function registerVisit(){
+  const name = (val("patientName")||"").trim();
+  if(!name){ alert("Escribe un nombre de paciente antes de registrar la visita."); return; }
+  computeAll(); // aseguramos valores actualizados
+  const ageCore = document.getElementById("age_core").innerText.replace(" años","");
+  const ageExt  = document.getElementById("age_ext").innerText.replace(" años","");
+  const dateStr = val("visitDate") || new Date().toISOString().slice(0,10);
+
+  const profiles = getProfiles();
+  if(!profiles[name]){ saveProfile(); }
+  const p = getProfiles();
+  if(!p[name].__visits) p[name].__visits = [];
+  p[name].__visits.push({date: dateStr, age_core: parseFloat(ageCore), age_ext: parseFloat(ageExt)});
+  setProfiles(p);
+  refreshProfileList(name);
+  renderEvolution(name);
+  alert("Visita registrada ("+dateStr+").");
+}
+
+function duplicateToday(){
+  const currName = (val("patientName")||"").trim();
+  const today = new Date().toISOString().slice(0,10);
+  const newName = (currName||"Paciente") + " " + today;
+  const data = readForm();
+  data.visitDate = today;
+  const p = getProfiles();
+  p[newName] = data;
+  setProfiles(p);
+  refreshProfileList(newName);
+  document.getElementById("patientName").value = newName;
+  document.getElementById("visitDate").value = today;
+  alert("Duplicado con fecha de hoy: " + newName);
+}
+
+/* Render simple SVG line chart (age_ext over time) */
+function renderEvolution(name){
+  const el = document.getElementById("evoChart");
+  const empty = document.getElementById("evoEmpty");
+  if(!el) return;
+  el.innerHTML = "";
+  const p = getProfiles();
+  const rec = p[name];
+  const visits = rec && rec.__visits ? rec.__visits.slice().sort((a,b)=>a.date.localeCompare(b.date)) : [];
+  if(!visits.length){
+    empty.style.display = "block";
+    return;
+  }
+  empty.style.display = "none";
+
+  // dimensions
+  const W = el.clientWidth || 800, H = 260, padding = {l:48, r:16, t:16, b:28};
+  const xs = visits.map(v=>new Date(v.date).getTime());
+  const ys = visits.map(v=>v.age_ext);
+  const xMin = Math.min(...xs), xMax = Math.max(...xs);
+  const yMin = Math.min(...ys), yMax = Math.max(...ys);
+  const xScale = (x)=> padding.l + ( (x - xMin) / (xMax - xMin || 1) ) * (W - padding.l - padding.r);
+  const yScale = (y)=> H - padding.b - ( (y - yMin) / (yMax - yMin || 1) ) * (H - padding.t - padding.b);
+
+  const svg = document.createElementNS("http://www.w3.org/2000/svg","svg");
+  svg.setAttribute("width", W); svg.setAttribute("height", H);
+
+  // axes
+  const axis = document.createElementNS(svg.namespaceURI,"g");
+  const x0 = yScale(yMin);
+  // y ticks
+  const yTicks=5;
+  for(let i=0;i<=yTicks;i++){
+    const v = yMin + (i*(yMax - yMin)/yTicks);
+    const y = yScale(v);
+    const line = document.createElementNS(svg.namespaceURI,"line");
+    line.setAttribute("x1", padding.l); line.setAttribute("x2", W - padding.r);
+    line.setAttribute("y1", y); line.setAttribute("y2", y);
+    line.setAttribute("stroke", "#1a2035"); line.setAttribute("stroke-width", "1");
+    svg.appendChild(line);
+    const txt = document.createElementNS(svg.namespaceURI,"text");
+    txt.setAttribute("x", 8); txt.setAttribute("y", y+4);
+    txt.setAttribute("fill", "#9aa4c4"); txt.setAttribute("font-size","12");
+    txt.textContent = v.toFixed(1);
+    svg.appendChild(txt);
+  }
+  // path
+  let d="";
+  visits.forEach((v,i)=>{
+    const X = xScale(new Date(v.date).getTime());
+    const Y = yScale(v.age_ext);
+    d += (i==0 ? "M" : "L") + X + " " + Y + " ";
+  });
+  const path = document.createElementNS(svg.namespaceURI,"path");
+  path.setAttribute("d", d);
+  path.setAttribute("fill","none");
+  path.setAttribute("stroke","#62ffd0");
+  path.setAttribute("stroke-width","2");
+  svg.appendChild(path);
+  // points
+  visits.forEach((v)=>{
+    const X = xScale(new Date(v.date).getTime());
+    const Y = yScale(v.age_ext);
+    const c = document.createElementNS(svg.namespaceURI,"circle");
+    c.setAttribute("cx", X); c.setAttribute("cy", Y); c.setAttribute("r","3.5");
+    c.setAttribute("fill","#62ffd0");
+    svg.appendChild(c);
+  });
+  el.appendChild(svg);
+}
+
+
+/* Auto-guardado del borrador actual */
+function autosaveDraft(){
+  const draft = readForm();
+  localStorage.setItem("thymeage_draft", JSON.stringify(draft));
+}
+function restoreDraft(){
+  try{
+    const draft = JSON.parse(localStorage.getItem("thymeage_draft")||"null");
+    if(draft){ writeForm(draft); }
+  }catch(e){}
+}
+
+/* Enlazar cambios para autosave */
+function bindAutosave(){
+  document.querySelectorAll('input, select').forEach(el=>{
+    el.addEventListener('change', autosaveDraft);
+    el.addEventListener('input', (e)=>{
+      // Solo autosave en input si es text/number para no saturar
+      if(el.tagName==="INPUT") autosaveDraft();
+    });
+  });
+}
+
+window.addEventListener("DOMContentLoaded", ()=>{
+  try{
+    document.getElementById("sex").value="female";
+    document.getElementById("age").value=39;
+    document.getElementById("SBP").value=118;
+    document.getElementById("nonHDL").value=130;
+    document.getElementById("A1c").value=5.2;
+    document.getElementById("eGFR").value=110;
+    document.getElementById("CRP").value=1.2;
+    document.getElementById("waist").value=72;
+    document.getElementById("height").value=165;
+    document.getElementById("RHR").value=64;
+    document.getElementById("VO2").value=36;
+    document.getElementById("grip").value=28;
+    document.getElementById("smoke").value="never";
+    document.getElementById("TST").value=7.0;
+    document.getElementById("SE").value=88;
+    document.getElementById("STOP").value="no";
+    document.getElementById("PSS").value=14;
+    document.getElementById("PHQ").value=3;
+    document.getElementById("GAD").value=3;
+    document.getElementById("MVPA").value=150;
+    document.getElementById("STR").value=2;
+    document.getElementById("MedDiet").value=7;
+    document.getElementById("Ultra").value=3;
+    document.getElementById("AlcoholU").value=2;
+    computeAll();
+
+    // Inicialización de perfiles/draft
+    try{
+      refreshProfileList(localStorage.getItem("thymeage_last_patient")||"");
+      restoreDraft();
+      const last = localStorage.getItem("thymeage_last_patient");
+      if(last){
+        loadProfile(last);
+        renderEvolution(last);
+      }
+      bindAutosave();
+      updateObBlock();
+    }catch(e){ console.error('Profiles init error', e); }
+
+  }catch(e){ console.error('Init error', e); }
 });
 </script>
 </body>
